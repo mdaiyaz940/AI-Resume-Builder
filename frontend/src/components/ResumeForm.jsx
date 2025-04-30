@@ -12,7 +12,7 @@ export default function ResumeForm({ resumeData, handleChange, errors, onSave })
     try {
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        "http://localhost:5000/api/resume",
+        `${import.meta.env.VITE_BACKEND_URL}/api/resume`,
         resumeData,
         {
           headers: {

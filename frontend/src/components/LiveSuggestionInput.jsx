@@ -27,7 +27,7 @@ const LiveSuggestionInput = ({ name, value, onChange, model }) => {
     try {
       const formattedSuggestionPrompt = `Improve this ${name} professionally:\n"${input}"`;
 
-      const res = await axios.post("http://localhost:5000/api/ai/generate", {
+      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/ai/generate`, {
         prompt: formattedSuggestionPrompt,
         model: "gemini-1.5-flash",
       });

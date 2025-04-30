@@ -30,7 +30,7 @@ export default function SignupForm({ onSignupSuccess }) {
     }
 
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/register", form);
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/register`, form);
       localStorage.setItem("token", response.data.token);
       toast.success("Signup successful!");
       onSignupSuccess(response.data.user);

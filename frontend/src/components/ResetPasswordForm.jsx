@@ -25,7 +25,7 @@ export default function ResetPasswordForm({ onBackToLogin }) {
 
     try {
       setLoading(true);
-      const response = await axios.post("http://localhost:5000/api/auth/reset-password", {
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/reset-password`, {
         email,
         token: resetCode,
         password: newPassword,

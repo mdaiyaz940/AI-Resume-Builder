@@ -26,7 +26,7 @@ export default function LoginForm({ onLoginSuccess, onForgotPassword, onSwitchTo
     }
 
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/login", form);
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/login`, form);
       localStorage.setItem("token", response.data.token);
       toast.success("Login successful!");
       onLoginSuccess(response.data.user);

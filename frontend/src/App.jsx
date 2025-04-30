@@ -45,7 +45,7 @@ export default function App() {
     const token = localStorage.getItem("token");
     if (token) {
       axios
-        .get("http://localhost:5000/api/auth/profile", {
+        .get(`${import.meta.env.VITE_BACKEND_URL}/api/auth/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((res) => setUser(res.data.user))
@@ -58,7 +58,7 @@ export default function App() {
       const token = localStorage.getItem("token");
       if (token && user) {
         try {
-          const res = await axios.get("http://localhost:5000/api/resume/user/all", {
+          const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/resume/user/all`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           setSavedResumes(res.data); // Update the savedResumes state
@@ -175,7 +175,7 @@ export default function App() {
     setLoading(true);
     setGeneratedText("");
     try {
-      const res = await axios.post("http://localhost:5000/api/ai/generate", {
+      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/ai/generate`, {
         prompt: prompt, // Send the raw user prompt
         model: "gemini-1.5-flash", // Or your preferred model
       });
@@ -194,7 +194,7 @@ export default function App() {
     const token = localStorage.getItem("token");
     if (token) {
       try {
-        const res = await axios.get(`http://localhost:5000/api/resume/${resumeId}`, { // Corrected endpoint based on your routes
+        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/resume/${resumeId}`, { // Corrected endpoint based on your routes
           headers: { Authorization: `Bearer ${token}` },
         });
         // Ensure arrays are actually arrays when loading
@@ -227,7 +227,7 @@ export default function App() {
     const token = localStorage.getItem("token");
     if (token) {
       try {
-        await axios.delete(`http://localhost:5000/api/resume/${resumeId}`, {
+        await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/resume/${resumeId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         toast.success("✅ Resume deleted successfully!");
@@ -244,7 +244,7 @@ export default function App() {
     const token = localStorage.getItem("token");
     if (token && user) {
       try {
-        const res = await axios.get("http://localhost:5000/api/resume/user/all", {
+        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/resume/user/all`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setSavedResumes(res.data); // Update the savedResumes state
