@@ -12,7 +12,7 @@ app.use(express.json());
 
 // Manual CORS middleware
 app.use((req, res, next) => {
-  const allowedOrigins = ['https://ai-resume-builder-sand-nu.vercel.app', 'http://localhost:5173'];
+  const allowedOrigins = ['https://ai-resume-builder-sand-nu.vercel.app','https://ai-resume-builder-sand-nu.vercel.app/', 'http://localhost:5173'];
   const origin = req.headers.origin;
 
   if (allowedOrigins.includes(origin)) {
