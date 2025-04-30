@@ -18,5 +18,22 @@
     "routes": [
       { "src": "/api/(.*)", "dest": "backend/index.js" },
       { "src": "/(.*)", "dest": "frontend/build/index.html" }
+    ],
+    "headers": [
+      {
+        "source": "/api/(.*)",
+        "headers": [
+          { "key": "Access-Control-Allow-Origin", "value": "https://ai-resume-builder-sand-nu.vercel.app" },
+          { "key": "Access-Control-Allow-Methods", "value": "GET, POST, PUT, DELETE, OPTIONS" },
+          { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" },
+          { "key": "Access-Control-Allow-Credentials", "value": "true" }
+        ]
+      },
+      {
+        "source": "/(.*)",
+        "headers": [
+          { "key": "Access-Control-Allow-Origin", "value": "https://ai-resume-builder-sand-nu.vercel.app" }
+        ]
+      }
     ]
   }
