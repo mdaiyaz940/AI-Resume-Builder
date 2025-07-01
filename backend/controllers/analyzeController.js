@@ -52,13 +52,35 @@ ${resumeText}
 
     res.json({ output });
 
-    await Resume.create({
-      summary: resumeText,
-      user: req.user._id,
-      analyzed: true,
-    });
+   
   } catch (error) {
     console.error("Gemini analysis error:", error.response?.data || error.message);
     res.status(500).json({ error: "Failed to analyze resume." });
+  }
+};
+
+// controllers/analyzeController.js
+
+export const saveResumeAnalysis = async (req, res) => {
+  const { atsScore, improvements, keywords,jobRole } = req.body;
+
+  if (atsScore == null || !Array.isArray(improvements) || !Array.isArray(keywords)) {
+    return res.status(400).json({ error: "Invalid analysis data" });
+  }
+
+  try {
+    await Resume.create({
+        title: `Analysis for ${jobRole}`,
+      atsScore,
+      improvements,
+      keywords,
+      user: req.user._id,
+      analyzed: true,
+    });
+
+    res.status(201).json({ message: "Resume analysis saved successfully" });
+  } catch (err) {
+    console.error("Save analysis error:", err.message);
+    res.status(500).json({ error: "Failed to save resume analysis" });
   }
 };

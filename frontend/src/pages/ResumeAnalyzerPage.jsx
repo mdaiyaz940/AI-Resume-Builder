@@ -87,6 +87,26 @@ export default function ResumeAnalyzerPage() {
     return { score, tips, keywords };
   };
 
+  const saveAnalysisToBackend = async ({ score, tips, keywords }) => {
+  try {
+    const token = localStorage.getItem("token");
+    await axios.post(
+      `${import.meta.env.VITE_BACKEND_URL}/api/resume/save-analysis`,
+      { atsScore: score, improvements: tips, keywords, jobRole },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log("✅ Saved analysis to DB");
+  } catch (err) {
+    console.error("❌ Failed to save analysis:", err.response?.data || err.message);
+    toast.error("Failed to save analysis");
+  }
+};
+
+
   
   const handleAnalyze = async () => {
   if (!file || !jobRole.trim()) {
@@ -112,7 +132,9 @@ export default function ResumeAnalyzerPage() {
     }
 
     setAnalysis(rawText);
-    setParsedOutput(parseAIResponse(rawText));
+    const parsed = parseAIResponse(rawText);
+setParsedOutput(parsed);
+await saveAnalysisToBackend(parsed);
     toast.success("✅ Resume analyzed successfully!");
   } catch (err) {
     console.error("Analysis failed:", err);

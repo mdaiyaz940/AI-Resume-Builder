@@ -26,7 +26,7 @@ export default function SavedResumes({ savedResumes = [], onLoadResume, onDelete
               className="flex flex-wrap items-center justify-between border-b border-gray-200 py-3 last:border-b-0 max-lg:py-2.5" // Added flex-wrap for smaller screens
             >
               <div className="mb-2 flex-grow pr-4 max-lg:mb-2 max-lg:w-full"> {/* Allow info to take space, add padding */}
-                <strong className="font-bold text-gray-800 max-lg:text-[0.95rem]">{resume.name || 'Untitled Resume'}</strong> – {resume.email}
+                <strong className="font-bold text-gray-800 max-lg:text-[0.95rem]">{resume.name || resume.title || 'Untitled Resume'}</strong> – {resume.email}
                 <small className="mt-1 block text-xs text-gray-500"> {/* Adjusted size */}
                   Created on {new Date(resume.createdAt).toLocaleDateString()}
                 </small>

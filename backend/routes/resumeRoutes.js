@@ -6,10 +6,12 @@ import {
   getUserResumes,
   deleteResumeById, // ✅ Import the delete controller function
 } from "../controllers/resumeController.js";
+import { saveResumeAnalysis } from "../controllers/analyzeController.js";
 import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
+router.post("/save-analysis", protect, saveResumeAnalysis);
 // Protected route to save resume
 router.post("/", protect, createResume);
 

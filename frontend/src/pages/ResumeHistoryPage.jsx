@@ -17,7 +17,6 @@ export default function ResumeHistoryPage() {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        // Split into built and analyzed
         const built = res.data.filter((r) => r.analyzed === false);
         const analyzed = res.data.filter((r) => r.analyzed === true);
 
@@ -91,67 +90,104 @@ export default function ResumeHistoryPage() {
       {/* Resume Preview */}
       {selectedResume && (
         <div className="mt-8 bg-white p-6 rounded-lg shadow-lg border">
-          <h3 className="text-xl font-bold mb-2 text-emerald-700">
-            {selectedResume.name}'s Resume
-          </h3>
-          <p className="text-gray-600 mb-1"><strong>Email:</strong> {selectedResume.email}</p>
-          <p className="text-gray-600 mb-1"><strong>Phone:</strong> {selectedResume.phone}</p>
-          <p className="text-gray-600 mb-4"><strong>Summary:</strong> {selectedResume.summary}</p>
-
-          {selectedResume.skills && (
+          {selectedResume.analyzed ? (
             <>
-              <p className="text-gray-800 font-semibold">Skills:</p>
-              <ul className="list-disc list-inside mb-4 text-gray-600">
-                {selectedResume.skills.split(",").map((skill, i) => (
-                  <li key={i}>{skill.trim()}</li>
-                ))}
-              </ul>
+              <h3 className="text-xl font-bold mb-4 text-blue-700">Analyzed Resume Insights</h3>
+              <p className="text-gray-700 text-lg mb-2">
+                <strong>ATS Score:</strong>{" "}
+                <span className="text-emerald-600 font-semibold">{selectedResume.atsScore}/100</span>
+              </p>
+
+              {selectedResume.improvements?.length > 0 && (
+                <>
+                  <p className="text-gray-800 font-semibold mt-4 mb-2">Improvement Suggestions:</p>
+                  <ul className="list-disc list-inside text-gray-700 text-sm">
+                    {selectedResume.improvements.map((tip, i) => (
+                      <li key={i}>{tip}</li>
+                    ))}
+                  </ul>
+                </>
+              )}
+
+              {selectedResume.keywords?.length > 0 && (
+                <>
+                  <p className="text-gray-800 font-semibold mt-4 mb-2">Essential Keywords:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedResume.keywords.map((kw, i) => (
+                      <span
+                        key={i}
+                        className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm border border-blue-300"
+                      >
+                        {kw}
+                      </span>
+                    ))}
+                  </div>
+                </>
+              )}
             </>
-          )}
-
-          {selectedResume.experience?.length > 0 && (
+          ) : (
             <>
-              <p className="text-gray-800 font-semibold">Experience:</p>
-              {selectedResume.experience.map((exp, i) => (
-                <div key={i} className="mb-2 text-sm text-gray-700">
-                  <p><strong>{exp.jobTitle}</strong> at {exp.company}</p>
-                  <p>{exp.startDate} – {exp.endDate}</p>
-                  <p>{exp.description}</p>
-                </div>
-              ))}
-            </>
-          )}
+              <h3 className="text-xl font-bold mb-2 text-emerald-700">{selectedResume.name}'s Resume</h3>
+              <p className="text-gray-600 mb-1"><strong>Email:</strong> {selectedResume.email}</p>
+              <p className="text-gray-600 mb-1"><strong>Phone:</strong> {selectedResume.phone}</p>
+              <p className="text-gray-600 mb-4"><strong>Summary:</strong> {selectedResume.summary}</p>
 
-          {selectedResume.education?.length > 0 && (
-            <>
-              <p className="text-gray-800 font-semibold mt-4">Education:</p>
-              {selectedResume.education.map((edu, i) => (
-                <div key={i} className="mb-2 text-sm text-gray-700">
-                  <p><strong>{edu.degree}</strong> at {edu.institution}</p>
-                  <p>{edu.startDate} – {edu.endDate}</p>
-                  <p>{edu.description}</p>
-                </div>
-              ))}
-            </>
-          )}
+              {selectedResume.skills && (
+                <>
+                  <p className="text-gray-800 font-semibold">Skills:</p>
+                  <ul className="list-disc list-inside mb-4 text-gray-600">
+                    {selectedResume.skills.split(",").map((skill, i) => (
+                      <li key={i}>{skill.trim()}</li>
+                    ))}
+                  </ul>
+                </>
+              )}
 
-          {selectedResume.projects?.length > 0 && (
-            <>
-              <p className="text-gray-800 font-semibold mt-4">Projects:</p>
-              {selectedResume.projects.map((proj, i) => (
-                <div key={i} className="mb-2 text-sm text-gray-700">
-                  <p><strong>{proj.title}</strong></p>
-                  <p>{proj.description}</p>
-                  <p><em>Technologies: {proj.technologies}</em></p>
-                </div>
-              ))}
-            </>
-          )}
+              {selectedResume.experience?.length > 0 && (
+                <>
+                  <p className="text-gray-800 font-semibold">Experience:</p>
+                  {selectedResume.experience.map((exp, i) => (
+                    <div key={i} className="mb-2 text-sm text-gray-700">
+                      <p><strong>{exp.jobTitle}</strong> at {exp.company}</p>
+                      <p>{exp.startDate} – {exp.endDate}</p>
+                      <p>{exp.description}</p>
+                    </div>
+                  ))}
+                </>
+              )}
 
-          {selectedResume.achievements && (
-            <>
-              <p className="text-gray-800 font-semibold mt-4">Achievements:</p>
-              <p className="text-gray-600 text-sm">{selectedResume.achievements}</p>
+              {selectedResume.education?.length > 0 && (
+                <>
+                  <p className="text-gray-800 font-semibold mt-4">Education:</p>
+                  {selectedResume.education.map((edu, i) => (
+                    <div key={i} className="mb-2 text-sm text-gray-700">
+                      <p><strong>{edu.degree}</strong> at {edu.institution}</p>
+                      <p>{edu.startDate} – {edu.endDate}</p>
+                      <p>{edu.description}</p>
+                    </div>
+                  ))}
+                </>
+              )}
+
+              {selectedResume.projects?.length > 0 && (
+                <>
+                  <p className="text-gray-800 font-semibold mt-4">Projects:</p>
+                  {selectedResume.projects.map((proj, i) => (
+                    <div key={i} className="mb-2 text-sm text-gray-700">
+                      <p><strong>{proj.title}</strong></p>
+                      <p>{proj.description}</p>
+                      <p><em>Technologies: {proj.technologies}</em></p>
+                    </div>
+                  ))}
+                </>
+              )}
+
+              {selectedResume.achievements && (
+                <>
+                  <p className="text-gray-800 font-semibold mt-4">Achievements:</p>
+                  <p className="text-gray-600 text-sm">{selectedResume.achievements}</p>
+                </>
+              )}
             </>
           )}
         </div>

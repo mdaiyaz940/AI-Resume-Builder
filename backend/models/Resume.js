@@ -33,6 +33,13 @@ const resumeSchema = new mongoose.Schema({
     },
   ],
   achievements: String,
+  atsScore: Number,
+  improvements: [String],
+  keywords: [String],
+  title: {
+    type: String,
+    default: "Untitled Resume", // optional default
+  },
   analyzed: { type: Boolean, default: false }, // ✅ NEW FIELD
   user: {
     type: mongoose.Schema.Types.ObjectId,
