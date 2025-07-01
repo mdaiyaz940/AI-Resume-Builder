@@ -9,14 +9,14 @@ import {
 export default function Layout({ handleLogout }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [userName, setUserName] = useState("");
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef();
 
   // Auto-close dropdown when clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false);
+        setDropdownOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -92,41 +92,45 @@ export default function Layout({ handleLogout }) {
       {/* Right Section: Main */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         {/* Sticky Header */}
-         <header className="bg-white shadow p-4 flex justify-between items-center sticky top-0 z-40">
-      {/* Left greeting */}
-      <div className="flex items-center gap-2">
-        <Smile className="text-emerald-500" size={22} />
-        <h1 className="text-md font-semibold text-gray-700">
-          Hello, <span className="text-emerald-600 font-bold">{userName}</span> 👋
-        </h1>
+        <header className="bg-white shadow p-4 flex justify-between items-center sticky top-0 z-40">
+      {/* Left Side */}
+      <div className="flex items-center gap-4">
+        <button className="md:hidden" onClick={toggleSidebar}>
+          <Menu size={24} className="text-gray-700" />
+        </button>
+        <div className="flex items-center gap-2">
+          <Smile className="text-emerald-500" size={20} />
+          <h1 className="text-md font-semibold text-gray-700">
+            Hello, <span className="text-emerald-600 font-bold">{userName}</span> 👋
+          </h1>
+        </div>
       </div>
 
-      {/* Right dropdown */}
+      {/* Right Side Dropdown */}
       <div className="relative" ref={dropdownRef}>
         <button
-          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-          className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-md hover:bg-gray-100 text-gray-700 transition"
+          onClick={() => setDropdownOpen(!dropdownOpen)}
+          className="flex items-center gap-2 px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 transition"
         >
-          <UserCircle size={20} />
-          <span className="hidden md:inline text-sm font-medium">Account</span>
-          <ChevronDown size={18} />
+          <User size={18} />
+          <span className="hidden md:inline">Account</span>
         </button>
 
-        {isDropdownOpen && (
-          <div className="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-md py-2 z-50">
+        {dropdownOpen && (
+          <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
             <NavLink
               to="profile"
-              className="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition"
-              onClick={() => setIsDropdownOpen(false)} // Close on click
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              onClick={() => setDropdownOpen(false)}
             >
               View Profile
             </NavLink>
             <button
               onClick={() => {
-                setIsDropdownOpen(false);
                 handleLogout();
+                setDropdownOpen(false);
               }}
-              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition"
+              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
             >
               Logout
             </button>
