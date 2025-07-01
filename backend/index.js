@@ -18,7 +18,9 @@ app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
 
 // Manual CORS middleware
 app.use((req, res, next) => {
-  const allowedOrigins = ['https://ai-resume-builder-sand-nu.vercel.app','https://ai-resume-builder-sand-nu.vercel.app/', 'http://localhost:5173'];
+  const allowedOrigins = ["http://localhost:5173",
+  "https://ai-resume-builder-sand-nu.vercel.app",
+  "https://ai-resume-builder-dtcle4fgh-md-aiyaz-ansaris-projects.vercel.app"];
   const origin = req.headers.origin;
 
   if (allowedOrigins.includes(origin)) {
