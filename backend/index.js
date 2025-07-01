@@ -22,6 +22,7 @@ app.use((req, res, next) => {
   "https://ai-resume-builder-sand-nu.vercel.app",
   "https://ai-resume-builder-dtcle4fgh-md-aiyaz-ansaris-projects.vercel.app"];
   const origin = req.headers.origin;
+console.log("Origin:", req.headers.origin);
 
   if (allowedOrigins.includes(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
