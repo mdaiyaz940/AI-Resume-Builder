@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { FiUserPlus } from 'react-icons/fi'; // Feather Icons
+import { FiUserPlus, FiMail, FiLock, FiUser } from "react-icons/fi";
 
 export default function SignupForm({ onSignupSuccess }) {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
@@ -42,45 +42,61 @@ export default function SignupForm({ onSignupSuccess }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white p-8 rounded-md shadow-md max-w-md mt-10 mx-auto flex flex-col gap-6 border border-gray-200"
+      className="bg-white p-8 rounded-xl shadow-lg max-w-md mt-10 mx-auto flex flex-col gap-6 border border-gray-100 transition-all duration-300"
     >
-      <h2 className="text-2xl font-bold text-emerald-500 text-center mb-4">Create an Account</h2>
+      <div className="text-center">
+        <h2 className="text-3xl font-extrabold text-emerald-600">Create Account</h2>
+        <p className="text-gray-500 text-sm mt-1">Join and build your resume with AI</p>
+      </div>
 
-      <input
-        type="text"
-        name="name"
-        placeholder="Full Name"
-        value={form.name}
-        onChange={handleChange}
-        className="w-full px-4 py-3 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-emerald-500 text-base"
-        required
-      />
+      {/* Full Name Field */}
+      <div className="relative">
+        <FiUser className="absolute left-3 top-3.5 text-gray-400" size={20} />
+        <input
+          type="text"
+          name="name"
+          placeholder="Full Name"
+          value={form.name}
+          onChange={handleChange}
+          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-emerald-500 text-base"
+          required
+        />
+      </div>
 
-      <input
-        type="email"
-        name="email"
-        placeholder="Email"
-        value={form.email}
-        onChange={handleChange}
-        className="w-full px-4 py-3 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-emerald-500 text-base"
-        required
-      />
+      {/* Email Field */}
+      <div className="relative">
+        <FiMail className="absolute left-3 top-3.5 text-gray-400" size={20} />
+        <input
+          type="email"
+          name="email"
+          placeholder="Email Address"
+          value={form.email}
+          onChange={handleChange}
+          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-emerald-500 text-base"
+          required
+        />
+      </div>
 
-      <input
-        type="password"
-        name="password"
-        placeholder="Password"
-        value={form.password}
-        onChange={handleChange}
-        className="w-full px-4 py-3 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-emerald-500 text-base"
-        required
-      />
+      {/* Password Field */}
+      <div className="relative">
+        <FiLock className="absolute left-3 top-3.5 text-gray-400" size={20} />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password (min 6 characters)"
+          value={form.password}
+          onChange={handleChange}
+          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-emerald-500 text-base"
+          required
+        />
+      </div>
 
+      {/* Submit Button */}
       <button
         type="submit"
-        className="w-full bg-emerald-500 text-white py-3 rounded-md font-semibold transition duration-200 hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-1 flex items-center justify-center"
+        className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-md font-semibold transition duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-400 flex items-center justify-center shadow-md"
       >
-        <FiUserPlus className="inline-block mr-2 align-middle" size={18} />
+        <FiUserPlus className="mr-2" size={18} />
         Sign Up
       </button>
     </form>

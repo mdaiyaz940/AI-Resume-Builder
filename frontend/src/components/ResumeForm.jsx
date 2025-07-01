@@ -1,29 +1,38 @@
-// ResumeForm.jsx
 import React from "react";
 import axios from "axios";
-import { AiOutlineSave } from 'react-icons/ai'; // Import the save icon
 import { toast } from "react-toastify";
-import LiveSuggestionInput from "./LiveSuggestionInput"; // Assuming this is already Tailwind-compatible or doesn't need conversion here
+import LiveSuggestionInput from "./LiveSuggestionInput";
+import { 
+  Save, 
+  Plus, 
+  Trash2, 
+  ChevronDown,
+  ChevronUp,
+  Briefcase,
+  GraduationCap,
+  Code2,
+  Award,
+  Phone,
+  Mail,
+  User
+} from "lucide-react";
 
-// Removed: import "./styles.css"; // Import the consolidated CSS
-
-export default function ResumeForm({ resumeData, handleChange, errors, onSave }) {
+export default function ResumeForm({ resumeData = {}, handleChange, errors = {}, onSave, validateForm  }) {
   const saveResume = async () => {
+    const isValid = validateForm ? validateForm() : true;
+  if (!isValid) {
+    toast.error("❌ Please fix form errors before saving.");
+    return;
+  }
     try {
       const token = localStorage.getItem("token");
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/resume`,
         resumeData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       toast.success("✅ Resume saved! ID: " + response.data.id);
-      if (onSave) {
-        onSave(); // Call the onSave function (which is fetchResumes from App.js)
-      }
+      onSave?.();
     } catch (err) {
       toast.error("❌ Failed to save resume");
     }
@@ -45,354 +54,471 @@ export default function ResumeForm({ resumeData, handleChange, errors, onSave })
   };
 
   const handleSectionItemChange = (sectionName, index, field) => (e) => {
-    const { value } = e.target; // Use value from event directly
+    const { value } = e.target;
     const newSection = [...(resumeData[sectionName] || [])];
-    // Ensure the item exists before updating
     if (newSection[index]) {
-        newSection[index] = { ...newSection[index], [field]: value };
-        handleChange({ target: { name: sectionName, value: newSection } });
+      newSection[index] = { ...newSection[index], [field]: value };
+      handleChange({ target: { name: sectionName, value: newSection } });
     }
   };
 
-  // Specific add handlers
+  // Section handlers
   const handleAddExperience = () => handleAddSectionItem('experience', { jobTitle: "", company: "", startDate: "", endDate: "", description: "" });
   const handleAddEducation = () => handleAddSectionItem('education', { institution: "", degree: "", startDate: "", endDate: "", description: "" });
   const handleAddProject = () => handleAddSectionItem('projects', { title: "", description: "", technologies: "" });
 
-  // Specific remove handlers
   const handleRemoveExperience = (index) => handleRemoveSectionItem('experience', index);
   const handleRemoveEducation = (index) => handleRemoveSectionItem('education', index);
   const handleRemoveProject = (index) => handleRemoveSectionItem('projects', index);
 
-  // Specific change handlers (simplified)
   const handleExperienceChange = (index, field) => handleSectionItemChange('experience', index, field);
   const handleEducationChange = (index, field) => handleSectionItemChange('education', index, field);
   const handleProjectChange = (index, field) => handleSectionItemChange('projects', index, field);
 
+  // State for collapsible sections
+  const [expandedSections, setExpandedSections] = React.useState({
+    personal: true,
+    summary: true,
+    skills: true,
+    experience: true,
+    education: true,
+    projects: true,
+    achievements: true
+  });
+
+  const toggleSection = (section) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
 
   return (
-    <div className="mx-auto my-8 w-[95%] max-w-3xl rounded-xl bg-white p-8 shadow-md max-lg:w-full max-lg:p-6 max-lg:my-6">
-      <h2 className="mb-6 text-center text-3xl font-bold text-blue-500 max-lg:text-2xl">Resume Input</h2>
+    <div className="mx-auto w-full max-w-4xl rounded-lg bg-white p-4 shadow-md md:p-6">
+      <h2 className="mb-6 text-center text-2xl font-bold text-blue-600 md:text-3xl">
+        Resume Builder
+      </h2>
 
-      {/* Name */}
-      <div className="mb-5">
-        <label className="mb-2 block text-base font-medium text-gray-600">Full Name</label>
-        <input
-          type="text"
-          name="name"
-          value={resumeData.name || ""} // Controlled component should have value
-          onChange={handleChange}
-          className="w-full rounded-md border border-gray-300 p-3 text-base text-gray-800 transition duration-200 ease-in-out focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300/50"
-        />
-        {errors.name && <p className="mt-1 text-sm text-red-500">{errors.name}</p>}
-      </div>
+      {/* Personal Information */}
+      <div className="mb-6 rounded-lg border border-gray-200 bg-gray-50 p-4">
+        <div 
+          className="flex cursor-pointer items-center justify-between"
+          onClick={() => toggleSection('personal')}
+        >
+          <h3 className="flex items-center text-lg font-semibold text-gray-700">
+            <User className="mr-2 h-5 w-5" />
+            Personal Information
+          </h3>
+          {expandedSections.personal ? <ChevronUp /> : <ChevronDown />}
+        </div>
+        
+        {expandedSections.personal && (
+          <div className="mt-4 space-y-4">
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-600">Full Name</label>
+              <input
+                type="text"
+                name="name"
+                value={resumeData.name || ""}
+                onChange={handleChange}
+                className="w-full rounded-md border border-gray-300 p-2.5 text-sm text-gray-800 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300/50 md:text-base"
+              />
+              {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name}</p>}
+            </div>
 
-      {/* Email */}
-      <div className="mb-5">
-        <label className="mb-2 block text-base font-medium text-gray-600">Email</label>
-        <input
-          type="email"
-          name="email"
-          value={resumeData.email || ""}
-          onChange={handleChange}
-           className="w-full rounded-md border border-gray-300 p-3 text-base text-gray-800 transition duration-200 ease-in-out focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300/50"
-        />
-        {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email}</p>}
-      </div>
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-600">Email</label>
+              <div className="relative">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                  <Mail className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="email"
+                  name="email"
+                  value={resumeData.email || ""}
+                  onChange={handleChange}
+                  className="w-full rounded-md border border-gray-300 py-2.5 pl-10 pr-3 text-sm text-gray-800 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300/50 md:text-base"
+                />
+              </div>
+              {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email}</p>}
+            </div>
 
-      {/* Phone */}
-      <div className="mb-5">
-        <label className="mb-2 block text-base font-medium text-gray-600">Phone</label>
-        <input
-          type="tel"
-          name="phone"
-          value={resumeData.phone || ""}
-          onChange={handleChange}
-          className="w-full rounded-md border border-gray-300 p-3 text-base text-gray-800 transition duration-200 ease-in-out focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300/50"
-        />
-        {errors.phone && <p className="mt-1 text-sm text-red-500">{errors.phone}</p>}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-600">Phone</label>
+              <div className="relative">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                  <Phone className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={resumeData.phone || ""}
+                  onChange={handleChange}
+                  className="w-full rounded-md border border-gray-300 py-2.5 pl-10 pr-3 text-sm text-gray-800 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300/50 md:text-base"
+                />
+              </div>
+              {errors.phone && <p className="mt-1 text-xs text-red-500">{errors.phone}</p>}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Summary */}
-       <div className="mb-5">
-         <label className="mb-2 block text-base font-medium text-gray-600">Professional Summary</label>
-         <LiveSuggestionInput
-           name="summary"
-           value={resumeData.summary || ""}
-           onChange={handleChange} // Pass the parent handler directly
-           model="gemini-1.5-flash" // Example model
-           textareaClassName="w-full rounded-md border border-gray-300 p-3 text-base text-gray-800 transition duration-200 ease-in-out focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-300/50 placeholder-gray-400 max-lg:text-[0.95rem]" // Pass Tailwind classes for textarea
-           rows={4} // Standard attribute
-         />
-         {errors.summary && <p className="mt-1 text-sm text-red-500">{errors.summary}</p>}
-       </div>
-
-
-       {/* Skills */}
-        <div className="mb-5">
-          <label className="mb-2 block text-base font-medium text-gray-600">Skills (comma-separated)</label>
-           <LiveSuggestionInput
-             name="skills"
-             value={resumeData.skills || ""}
-             onChange={handleChange} // Pass the parent handler directly
-             model="gemini-1.5-flash" // Example model
-             textareaClassName="w-full rounded-md border border-gray-300 p-3 text-base text-gray-800 transition duration-200 ease-in-out focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-300/50 placeholder-gray-400 max-lg:text-[0.95rem]"
-             rows={4}
-           />
-          {errors.skills && <p className="mt-1 text-sm text-red-500">{errors.skills}</p>}
+      <div className="mb-6 rounded-lg border border-gray-200 bg-gray-50 p-4">
+        <div 
+          className="flex cursor-pointer items-center justify-between"
+          onClick={() => toggleSection('summary')}
+        >
+          <h3 className="flex items-center text-lg font-semibold text-gray-700">
+            Summary
+          </h3>
+          {expandedSections.summary ? <ChevronUp /> : <ChevronDown />}
         </div>
+        
+        {expandedSections.summary && (
+          <div className="mt-4">
+            <LiveSuggestionInput
+              name="summary"
+              value={resumeData.summary || ""}
+              onChange={handleChange}
+              model="gemini-1.5-flash"
+              textareaClassName="w-full rounded-md border border-gray-300 p-3 text-sm text-gray-800 transition duration-200 ease-in-out focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-300/50 placeholder-gray-400 md:text-base"
+              rows={4}
+            />
+            {errors.summary && <p className="mt-1 text-xs text-red-500">{errors.summary}</p>}
+          </div>
+        )}
+      </div>
 
-      {/* --- Experience Section --- */}
-      <div className="mb-5">
-        <label className="mb-2 block text-base font-medium text-gray-600">Experience</label>
-        {(resumeData.experience || []).map((exp, index) => (
-          <div key={`exp-${index}`} className="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4 max-lg:p-3">
-            <h3 className="mb-3 text-xl font-semibold text-gray-600 max-lg:text-lg">Experience {index + 1}</h3>
-            {/* Job Title */}
-            <div className="mb-5">
-              <label className="mb-2 block text-base font-medium text-gray-600">Job Title</label>
-              <input
-                type="text"
-                name={`experience[${index}].jobTitle`} // Keep name for potential direct handling if needed elsewhere
-                value={exp.jobTitle || ""}
-                onChange={handleExperienceChange(index, 'jobTitle')} // Use specific handler
-                className="w-full rounded-md border border-gray-300 p-3 text-base text-gray-800 transition duration-200 ease-in-out focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300/50 max-lg:text-[0.95rem]"
-              />
-            </div>
-            {/* Company */}
-            <div className="mb-5">
-                <label className="mb-2 block text-base font-medium text-gray-600">Company</label>
-                <input
-                    type="text"
-                    name={`experience[${index}].company`}
-                    value={exp.company || ""}
-                    onChange={handleExperienceChange(index, 'company')}
-                     className="w-full rounded-md border border-gray-300 p-3 text-base text-gray-800 transition duration-200 ease-in-out focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300/50 max-lg:text-[0.95rem]"
-                />
-            </div>
-            {/* Dates */}
-            <div className="mb-5 flex flex-wrap gap-4">
-              <div className="flex-1 min-w-[150px]"> {/* Ensure inputs don't get too small */}
-                <label className="mb-2 block text-base font-medium text-gray-600">Start Date</label>
-                <input
-                  type="text"
-                  name={`experience[${index}].startDate`}
-                  value={exp.startDate || ""}
-                  onChange={handleExperienceChange(index, 'startDate')}
-                  className="w-full rounded-md border border-gray-300 p-3 text-base text-gray-800 transition duration-200 ease-in-out focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300/50 max-lg:text-[0.95rem]"
-                  placeholder="e.g., Jan 2022"
-                />
+      {/* Skills */}
+      <div className="mb-6 rounded-lg border border-gray-200 bg-gray-50 p-4">
+        <div 
+          className="flex cursor-pointer items-center justify-between"
+          onClick={() => toggleSection('skills')}
+        >
+          <h3 className="flex items-center text-lg font-semibold text-gray-700">
+            Skills
+          </h3>
+          {expandedSections.skills ? <ChevronUp /> : <ChevronDown />}
+        </div>
+        
+        {expandedSections.skills && (
+          <div className="mt-4">
+            <LiveSuggestionInput
+              name="skills"
+              value={resumeData.skills || ""}
+              onChange={handleChange}
+              model="gemini-1.5-flash"
+              textareaClassName="w-full rounded-md border border-gray-300 p-3 text-sm text-gray-800 transition duration-200 ease-in-out focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-300/50 placeholder-gray-400 md:text-base"
+              rows={4}
+            />
+            {errors.skills && <p className="mt-1 text-xs text-red-500">{errors.skills}</p>}
+          </div>
+        )}
+      </div>
+
+      {/* Experience */}
+      <div className="mb-6 rounded-lg border border-gray-200 bg-gray-50 p-4">
+        <div 
+          className="flex cursor-pointer items-center justify-between"
+          onClick={() => toggleSection('experience')}
+        >
+          <h3 className="flex items-center text-lg font-semibold text-gray-700">
+            <Briefcase className="mr-2 h-5 w-5" />
+            Experience
+          </h3>
+          {expandedSections.experience ? <ChevronUp /> : <ChevronDown />}
+        </div>
+        
+        {expandedSections.experience && (
+          <div className="mt-4 space-y-4">
+            {(resumeData.experience || []).map((exp, index) => (
+              <div key={`exp-${index}`} className="rounded-lg border border-gray-200 bg-white p-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-md font-medium text-gray-700">Experience #{index + 1}</h4>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveExperience(index)}
+                    className="flex items-center rounded-md bg-red-50 px-3 py-1.5 text-sm text-red-600 hover:bg-red-100"
+                  >
+                    <Trash2 className="mr-1 h-4 w-4" /> Remove
+                  </button>
+                </div>
+
+                <div className="mt-3 grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-600">Job Title</label>
+                    <input
+                      type="text"
+                      value={exp.jobTitle || ""}
+                      onChange={handleExperienceChange(index, 'jobTitle')}
+                      className="w-full rounded-md border border-gray-300 p-2 text-sm text-gray-800 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300/50"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-600">Company</label>
+                    <input
+                      type="text"
+                      value={exp.company || ""}
+                      onChange={handleExperienceChange(index, 'company')}
+                      className="w-full rounded-md border border-gray-300 p-2 text-sm text-gray-800 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300/50"
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-3 grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-600">Start Date</label>
+                    <input
+                      type="text"
+                      value={exp.startDate || ""}
+                      onChange={handleExperienceChange(index, 'startDate')}
+                      className="w-full rounded-md border border-gray-300 p-2 text-sm text-gray-800 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300/50"
+                      placeholder="MM/YYYY"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-600">End Date</label>
+                    <input
+                      type="text"
+                      value={exp.endDate || ""}
+                      onChange={handleExperienceChange(index, 'endDate')}
+                      className="w-full rounded-md border border-gray-300 p-2 text-sm text-gray-800 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300/50"
+                      placeholder="MM/YYYY or Present"
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-3">
+                  <label className="mb-1 block text-sm font-medium text-gray-600">Description</label>
+                  <LiveSuggestionInput
+                    name={`experience[${index}].description`}
+                    value={exp.description || ""}
+                    onChange={handleExperienceChange(index, 'description')}
+                    model="gemini-1.5-flash"
+                    textareaClassName="w-full rounded-md border border-gray-300 p-2 text-sm text-gray-800 transition duration-200 ease-in-out focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-300/50 placeholder-gray-400"
+                    rows={3}
+                  />
+                </div>
               </div>
-              <div className="flex-1 min-w-[150px]">
-                <label className="mb-2 block text-base font-medium text-gray-600">End Date</label>
-                <input
-                  type="text"
-                  name={`experience[${index}].endDate`}
-                  value={exp.endDate || ""}
-                  onChange={handleExperienceChange(index, 'endDate')}
-                  className="w-full rounded-md border border-gray-300 p-3 text-base text-gray-800 transition duration-200 ease-in-out focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300/50 max-lg:text-[0.95rem]"
-                  placeholder="e.g., Present or Dec 2023"
-                />
-              </div>
-            </div>
-            {/* Description */}
-             <div className="mb-5">
-               <label className="mb-2 block text-base font-medium text-gray-600">Description</label>
-               <LiveSuggestionInput
-                 name={`experience[${index}].description`} // Keep unique name
-                 value={exp.description || ""}
-                 onChange={handleExperienceChange(index, 'description')} // Use specific handler
-                 model="gemini-1.5-flash"
-                 textareaClassName="w-full rounded-md border border-gray-300 p-3 text-base text-gray-800 transition duration-200 ease-in-out focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-300/50 placeholder-gray-400 max-lg:text-[0.95rem]"
-                 rows={4}
-               />
-             </div>
-            {/* Remove Button */}
+            ))}
+
             <button
               type="button"
-              onClick={() => handleRemoveExperience(index)}
-              className="rounded-md border-none bg-red-500 px-4 py-2.5 text-sm text-white transition duration-200 ease-in-out hover:scale-105 hover:bg-red-600 max-lg:px-3 max-lg:py-2 max-lg:text-[0.8rem]"
+              onClick={handleAddExperience}
+              className="flex w-full items-center justify-center rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
             >
-              Remove
+              <Plus className="mr-2 h-4 w-4" /> Add Experience
             </button>
           </div>
-        ))}
-        {/* Add Button */}
-        <button
-          type="button"
-          onClick={handleAddExperience}
-          className="mt-4 rounded-md border-none bg-green-500 px-5 py-3 text-base text-white transition duration-200 ease-in-out hover:scale-105 hover:bg-green-700 max-lg:px-4 max-lg:py-2 max-lg:text-[0.9rem]"
-        >
-          Add Experience
-        </button>
+        )}
       </div>
 
-      {/* --- Education Section --- (Similar structure as Experience) --- */}
-      <div className="mb-5">
-          <label className="mb-2 block text-base font-medium text-gray-600">Education</label>
-          {(resumeData.education || []).map((edu, index) => (
-              <div key={`edu-${index}`} className="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4 max-lg:p-3">
-                  <h3 className="mb-3 text-xl font-semibold text-gray-600 max-lg:text-lg">Education {index + 1}</h3>
-                  {/* Institution */}
-                  <div className="mb-5">
-                      <label className="mb-2 block text-base font-medium text-gray-600">Institution</label>
-                      <input
-                          type="text"
-                          name={`education[${index}].institution`}
-                          value={edu.institution || ""}
-                          onChange={handleEducationChange(index, 'institution')}
-                          className="w-full rounded-md border border-gray-300 p-3 text-base text-gray-800 transition duration-200 ease-in-out focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300/50 max-lg:text-[0.95rem]"
-                      />
-                  </div>
-                  {/* Degree */}
-                  <div className="mb-5">
-                      <label className="mb-2 block text-base font-medium text-gray-600">Degree</label>
-                      <input
-                          type="text"
-                          name={`education[${index}].degree`}
-                          value={edu.degree || ""}
-                          onChange={handleEducationChange(index, 'degree')}
-                           className="w-full rounded-md border border-gray-300 p-3 text-base text-gray-800 transition duration-200 ease-in-out focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300/50 max-lg:text-[0.95rem]"
-                      />
-                  </div>
-                  {/* Dates */}
-                  <div className="mb-5 flex flex-wrap gap-4">
-                      <div className="flex-1 min-w-[150px]">
-                          <label className="mb-2 block text-base font-medium text-gray-600">Start Date</label>
-                          <input
-                              type="text"
-                              name={`education[${index}].startDate`}
-                              value={edu.startDate || ""}
-                              onChange={handleEducationChange(index, 'startDate')}
-                              className="w-full rounded-md border border-gray-300 p-3 text-base text-gray-800 transition duration-200 ease-in-out focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300/50 max-lg:text-[0.95rem]"
-                              placeholder="e.g., Sep 2018"
-                          />
-                      </div>
-                      <div className="flex-1 min-w-[150px]">
-                          <label className="mb-2 block text-base font-medium text-gray-600">End Date</label>
-                          <input
-                              type="text"
-                              name={`education[${index}].endDate`}
-                              value={edu.endDate || ""}
-                              onChange={handleEducationChange(index, 'endDate')}
-                               className="w-full rounded-md border border-gray-300 p-3 text-base text-gray-800 transition duration-200 ease-in-out focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300/50 max-lg:text-[0.95rem]"
-                              placeholder="e.g., May 2022"
-                          />
-                      </div>
-                  </div>
-                   {/* Description */}
-                    <div className="mb-5">
-                      <label className="mb-2 block text-base font-medium text-gray-600">Description</label>
-                      <LiveSuggestionInput
-                        name={`education[${index}].description`}
-                        value={edu.description || ""}
-                        onChange={handleEducationChange(index, 'description')}
-                        model="gemini-1.5-flash"
-                         textareaClassName="w-full rounded-md border border-gray-300 p-3 text-base text-gray-800 transition duration-200 ease-in-out focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-300/50 placeholder-gray-400 max-lg:text-[0.95rem]"
-                        rows={4}
-                      />
-                    </div>
-                  {/* Remove Button */}
+      {/* Education */}
+      <div className="mb-6 rounded-lg border border-gray-200 bg-gray-50 p-4">
+        <div 
+          className="flex cursor-pointer items-center justify-between"
+          onClick={() => toggleSection('education')}
+        >
+          <h3 className="flex items-center text-lg font-semibold text-gray-700">
+            <GraduationCap className="mr-2 h-5 w-5" />
+            Education
+          </h3>
+          {expandedSections.education ? <ChevronUp /> : <ChevronDown />}
+        </div>
+        
+        {expandedSections.education && (
+          <div className="mt-4 space-y-4">
+            {(resumeData.education || []).map((edu, index) => (
+              <div key={`edu-${index}`} className="rounded-lg border border-gray-200 bg-white p-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-md font-medium text-gray-700">Education #{index + 1}</h4>
                   <button
-                      type="button"
-                      onClick={() => handleRemoveEducation(index)}
-                      className="rounded-md border-none bg-red-500 px-4 py-2.5 text-sm text-white transition duration-200 ease-in-out hover:scale-105 hover:bg-red-600 max-lg:px-3 max-lg:py-2 max-lg:text-[0.8rem]"
+                    type="button"
+                    onClick={() => handleRemoveEducation(index)}
+                    className="flex items-center rounded-md bg-red-50 px-3 py-1.5 text-sm text-red-600 hover:bg-red-100"
                   >
-                      Remove
+                    <Trash2 className="mr-1 h-4 w-4" /> Remove
                   </button>
+                </div>
+
+                <div className="mt-3 grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-600">Institution</label>
+                    <input
+                      type="text"
+                      value={edu.institution || ""}
+                      onChange={handleEducationChange(index, 'institution')}
+                      className="w-full rounded-md border border-gray-300 p-2 text-sm text-gray-800 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300/50"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-600">Degree</label>
+                    <input
+                      type="text"
+                      value={edu.degree || ""}
+                      onChange={handleEducationChange(index, 'degree')}
+                      className="w-full rounded-md border border-gray-300 p-2 text-sm text-gray-800 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300/50"
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-3 grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-600">Start Date</label>
+                    <input
+                      type="text"
+                      value={edu.startDate || ""}
+                      onChange={handleEducationChange(index, 'startDate')}
+                      className="w-full rounded-md border border-gray-300 p-2 text-sm text-gray-800 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300/50"
+                      placeholder="MM/YYYY"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-600">End Date</label>
+                    <input
+                      type="text"
+                      value={edu.endDate || ""}
+                      onChange={handleEducationChange(index, 'endDate')}
+                      className="w-full rounded-md border border-gray-300 p-2 text-sm text-gray-800 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300/50"
+                      placeholder="MM/YYYY"
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-3">
+                  <label className="mb-1 block text-sm font-medium text-gray-600">Description</label>
+                  <LiveSuggestionInput
+                    name={`education[${index}].description`}
+                    value={edu.description || ""}
+                    onChange={handleEducationChange(index, 'description')}
+                    model="gemini-1.5-flash"
+                    textareaClassName="w-full rounded-md border border-gray-300 p-2 text-sm text-gray-800 transition duration-200 ease-in-out focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-300/50 placeholder-gray-400"
+                    rows={3}
+                  />
+                </div>
               </div>
-          ))}
-          {/* Add Button */}
-          <button
+            ))}
+
+            <button
               type="button"
               onClick={handleAddEducation}
-               className="mt-4 rounded-md border-none bg-green-500 px-5 py-3 text-base text-white transition duration-200 ease-in-out hover:scale-105 hover:bg-green-700 max-lg:px-4 max-lg:py-2 max-lg:text-[0.9rem]"
-          >
-              Add Education
-          </button>
+              className="flex w-full items-center justify-center rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+            >
+              <Plus className="mr-2 h-4 w-4" /> Add Education
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* --- Projects Section --- (Similar structure) --- */}
-       <div className="mb-5">
-           <label className="mb-2 block text-base font-medium text-gray-600">Projects</label>
-           {(resumeData.projects || []).map((project, index) => (
-               <div key={`proj-${index}`} className="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4 max-lg:p-3">
-                   <h3 className="mb-3 text-xl font-semibold text-gray-600 max-lg:text-lg">Project {index + 1}</h3>
-                   {/* Title */}
-                   <div className="mb-5">
-                       <label className="mb-2 block text-base font-medium text-gray-600">Title</label>
-                       <input
-                           type="text"
-                           name={`projects[${index}].title`}
-                           value={project.title || ""}
-                           onChange={handleProjectChange(index, 'title')}
-                            className="w-full rounded-md border border-gray-300 p-3 text-base text-gray-800 transition duration-200 ease-in-out focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300/50 max-lg:text-[0.95rem]"
-                       />
-                   </div>
-                   {/* Description */}
-                   <div className="mb-5">
-                       <label className="mb-2 block text-base font-medium text-gray-600">Description</label>
-                        <LiveSuggestionInput
-                          name={`projects[${index}].description`}
-                          value={project.description || ""}
-                          onChange={handleProjectChange(index, 'description')}
-                          model="gemini-1.5-flash"
-                          textareaClassName="w-full rounded-md border border-gray-300 p-3 text-base text-gray-800 transition duration-200 ease-in-out focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-300/50 placeholder-gray-400 max-lg:text-[0.95rem]"
-                          rows={4}
-                        />
-                   </div>
-                    {/* Technologies */}
-                   <div className="mb-5">
-                        <label className="mb-2 block text-base font-medium text-gray-600">Technologies Used</label>
-                        <input
-                           type="text"
-                           name={`projects[${index}].technologies`}
-                           value={project.technologies || ""}
-                           onChange={handleProjectChange(index, 'technologies')}
-                           className="w-full rounded-md border border-gray-300 p-3 text-base text-gray-800 transition duration-200 ease-in-out focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300/50 max-lg:text-[0.95rem]"
-                        />
-                   </div>
-                   {/* Remove Button */}
-                   <button
-                       type="button"
-                       onClick={() => handleRemoveProject(index)}
-                       className="rounded-md border-none bg-red-500 px-4 py-2.5 text-sm text-white transition duration-200 ease-in-out hover:scale-105 hover:bg-red-600 max-lg:px-3 max-lg:py-2 max-lg:text-[0.8rem]"
-                   >
-                       Remove
-                   </button>
-               </div>
-           ))}
-           {/* Add Button */}
-           <button
-               type="button"
-               onClick={handleAddProject}
-                className="mt-4 rounded-md border-none bg-green-500 px-5 py-3 text-base text-white transition duration-200 ease-in-out hover:scale-105 hover:bg-green-700 max-lg:px-4 max-lg:py-2 max-lg:text-[0.9rem]"
-           >
-               Add Project
-           </button>
-       </div>
+      {/* Projects */}
+      <div className="mb-6 rounded-lg border border-gray-200 bg-gray-50 p-4">
+        <div 
+          className="flex cursor-pointer items-center justify-between"
+          onClick={() => toggleSection('projects')}
+        >
+          <h3 className="flex items-center text-lg font-semibold text-gray-700">
+            <Code2 className="mr-2 h-5 w-5" />
+            Projects
+          </h3>
+          {expandedSections.projects ? <ChevronUp /> : <ChevronDown />}
+        </div>
+        
+        {expandedSections.projects && (
+          <div className="mt-4 space-y-4">
+            {(resumeData.projects || []).map((project, index) => (
+              <div key={`proj-${index}`} className="rounded-lg border border-gray-200 bg-white p-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-md font-medium text-gray-700">Project #{index + 1}</h4>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveProject(index)}
+                    className="flex items-center rounded-md bg-red-50 px-3 py-1.5 text-sm text-red-600 hover:bg-red-100"
+                  >
+                    <Trash2 className="mr-1 h-4 w-4" /> Remove
+                  </button>
+                </div>
+
+                <div className="mt-3">
+                  <label className="mb-1 block text-sm font-medium text-gray-600">Title</label>
+                  <input
+                    type="text"
+                    value={project.title || ""}
+                    onChange={handleProjectChange(index, 'title')}
+                    className="w-full rounded-md border border-gray-300 p-2 text-sm text-gray-800 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300/50"
+                  />
+                </div>
+
+                <div className="mt-3">
+                  <label className="mb-1 block text-sm font-medium text-gray-600">Description</label>
+                  <LiveSuggestionInput
+                    name={`projects[${index}].description`}
+                    value={project.description || ""}
+                    onChange={handleProjectChange(index, 'description')}
+                    model="gemini-1.5-flash"
+                    textareaClassName="w-full rounded-md border border-gray-300 p-2 text-sm text-gray-800 transition duration-200 ease-in-out focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-300/50 placeholder-gray-400"
+                    rows={3}
+                  />
+                </div>
+
+                <div className="mt-3">
+                  <label className="mb-1 block text-sm font-medium text-gray-600">Technologies Used</label>
+                  <input
+                    type="text"
+                    value={project.technologies || ""}
+                    onChange={handleProjectChange(index, 'technologies')}
+                    className="w-full rounded-md border border-gray-300 p-2 text-sm text-gray-800 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300/50"
+                  />
+                </div>
+              </div>
+            ))}
+
+            <button
+              type="button"
+              onClick={handleAddProject}
+              className="flex w-full items-center justify-center rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+            >
+              <Plus className="mr-2 h-4 w-4" /> Add Project
+            </button>
+          </div>
+        )}
+      </div>
 
       {/* Achievements */}
-       <div className="mb-5">
-         <label className="mb-2 block text-base font-medium text-gray-600">Achievements / Certifications (each on a new line)</label>
-         <LiveSuggestionInput
-           name="achievements"
-           value={resumeData.achievements || ""}
-           onChange={handleChange}
-           model="gemini-1.5-flash"
-            textareaClassName="w-full rounded-md border border-gray-300 p-3 text-base text-gray-800 transition duration-200 ease-in-out focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-300/50 placeholder-gray-400 max-lg:text-[0.95rem]"
-           rows={4}
-         />
-         {errors.achievements && <p className="mt-1 text-sm text-red-500">{errors.achievements}</p>}
-       </div>
+      <div className="mb-6 rounded-lg border border-gray-200 bg-gray-50 p-4">
+        <div 
+          className="flex cursor-pointer items-center justify-between"
+          onClick={() => toggleSection('achievements')}
+        >
+          <h3 className="flex items-center text-lg font-semibold text-gray-700">
+            <Award className="mr-2 h-5 w-5" />
+            Achievements
+          </h3>
+          {expandedSections.achievements ? <ChevronUp /> : <ChevronDown />}
+        </div>
+        
+        {expandedSections.achievements && (
+          <div className="mt-4">
+            <LiveSuggestionInput
+              name="achievements"
+              value={resumeData.achievements || ""}
+              onChange={handleChange}
+              model="gemini-1.5-flash"
+              textareaClassName="w-full rounded-md border border-gray-300 p-3 text-sm text-gray-800 transition duration-200 ease-in-out focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-300/50 placeholder-gray-400 md:text-base"
+              rows={4}
+            />
+            {errors.achievements && <p className="mt-1 text-xs text-red-500">{errors.achievements}</p>}
+          </div>
+        )}
+      </div>
 
       {/* Save Button */}
-      <div className="mt-8 text-center max-lg:mt-6">
+      <div className="mt-6 text-center">
         <button
           onClick={saveResume}
-          className="inline-flex items-center rounded-md border-none bg-blue-500 px-6 py-4 text-lg font-medium text-white shadow-sm transition duration-200 ease-in-out hover:-translate-y-0.5 hover:bg-blue-600 hover:shadow-md max-lg:px-5 max-lg:py-3 max-lg:text-base"
+          className="inline-flex items-center rounded-md bg-blue-600 px-6 py-3 text-base font-medium text-white shadow-sm transition duration-200 ease-in-out hover:bg-blue-700 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
-          <AiOutlineSave className="mr-2 inline-block align-middle" size={18} /> Save Resume to DB
+          <Save className="mr-2 h-5 w-5" /> Save Resume
         </button>
       </div>
     </div>

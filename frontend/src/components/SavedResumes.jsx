@@ -14,7 +14,7 @@ export default function SavedResumes({ savedResumes = [], onLoadResume, onDelete
 
   return (
     <div className="mt-6 rounded-xl bg-white p-6 shadow max-lg:p-4">
-      <h2 className="mb-4 text-xl font-bold text-blue-500 max-lg:text-lg">Your Saved Resumes</h2>
+     
       {savedResumes.length === 0 ? (
         <p className="text-gray-500">No resumes saved yet.</p>
       ) : (

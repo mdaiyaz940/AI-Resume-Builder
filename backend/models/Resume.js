@@ -33,6 +33,7 @@ const resumeSchema = new mongoose.Schema({
     },
   ],
   achievements: String,
+  analyzed: { type: Boolean, default: false }, // ✅ NEW FIELD
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",

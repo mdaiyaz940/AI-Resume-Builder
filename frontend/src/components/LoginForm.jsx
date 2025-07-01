@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { FiLogIn } from 'react-icons/fi'; // Feather Icons
+import { FiLogIn, FiMail, FiLock } from "react-icons/fi";
 
 export default function LoginForm({ onLoginSuccess, onForgotPassword, onSwitchToSignup }) {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -13,7 +13,6 @@ export default function LoginForm({ onLoginSuccess, onForgotPassword, onSwitchTo
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Frontend validation
     if (!form.email || !form.password) {
       toast.error("Email and password are required.");
       return;
@@ -38,39 +37,51 @@ export default function LoginForm({ onLoginSuccess, onForgotPassword, onSwitchTo
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white p-6 rounded-md shadow-md max-w-md mt-8 mx-auto border border-gray-200 flex flex-col gap-4"
+      className="bg-white p-8 rounded-xl shadow-lg max-w-md mt-10 mx-auto flex flex-col gap-6 border border-gray-100 transition-all duration-300"
     >
-      <h2 className="text-xl font-bold text-emerald-500 text-center mb-5">Login</h2>
+      <div className="text-center">
+        <h2 className="text-3xl font-extrabold text-emerald-600">Welcome Back</h2>
+        <p className="text-gray-500 text-sm mt-1">Login to manage your resumes</p>
+      </div>
 
-      <input
-        type="email"
-        name="email"
-        placeholder="Email"
-        value={form.email}
-        onChange={handleChange}
-        className="w-full px-4 py-2 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-emerald-500 text-base"
-        required
-      />
+      {/* Email Field */}
+      <div className="relative">
+        <FiMail className="absolute left-3 top-3.5 text-gray-400" size={20} />
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={form.email}
+          onChange={handleChange}
+          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-emerald-500 text-base"
+          required
+        />
+      </div>
 
-      <input
-        type="password"
-        name="password"
-        placeholder="Password"
-        value={form.password}
-        onChange={handleChange}
-        className="w-full px-4 py-2 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-emerald-500 text-base"
-        required
-      />
+      {/* Password Field */}
+      <div className="relative">
+        <FiLock className="absolute left-3 top-3.5 text-gray-400" size={20} />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={form.password}
+          onChange={handleChange}
+          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-emerald-500 text-base"
+          required
+        />
+      </div>
 
+      {/* Login Button */}
       <button
         type="submit"
-        className="w-full bg-emerald-500 text-white py-2 rounded-md font-semibold transition duration-200 hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-1 flex items-center justify-center"
+        className="w-full bg-emerald-500 text-white py-3 rounded-md font-semibold transition duration-200 hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-400 flex items-center justify-center shadow-md"
       >
-        <FiLogIn className="inline-block mr-2 align-middle" size={18} /> Log In
+        <FiLogIn className="mr-2" size={18} />
+        Log In
       </button>
 
       
-     
     </form>
   );
 }

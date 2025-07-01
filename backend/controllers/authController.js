@@ -17,7 +17,11 @@ export const registerUser = async (req, res) => {
     const newUser = new User({ name, email, password: hashedPassword });
     await newUser.save();
 
-    const token = jwt.sign({ id: newUser._id }, JWT_SECRET, { expiresIn: "1d" });
+    const token = jwt.sign(
+  { id: newUser._id, name: newUser.name, email: newUser.email },
+  JWT_SECRET,
+  { expiresIn: "1d" }
+);
     res.status(201).json({ token, user: { id: newUser._id, name: newUser.name, email: newUser.email } });
   } catch (err) {
     res.status(500).json({ message: "Error registering user", error: err.message });
@@ -35,7 +39,11 @@ export const loginUser = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ message: "Invalid email or password" });
 
-    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "1d" });
+    const token = jwt.sign(
+  { id: user._id, name: user.name, email: user.email },
+  JWT_SECRET,
+  { expiresIn: "1d" }
+);
     res.json({ token, user: { id: user._id, name: user.name, email: user.email } });
   } catch (err) {
     res.status(500).json({ message: "Error logging in", error: err.message });
